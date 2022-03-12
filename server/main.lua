@@ -1,38 +1,33 @@
 ESX = nil
-
-TriggerEvent('esx:getSharedObject', function(obj) 
-    ESX = obj 
-end)
-
-local WitnessPeds = {}
-
+local SuspectPeds = {}
 local lastId = 0
 
-RegisterServerEvent('esx-qalle-camerasystem:addWitness')
-AddEventHandler('esx-qalle-camerasystem:addWitness', function(clothes, action)
-   
-    local src = tonumber(source)
-    local pedClothes = clothes
+TriggerEvent('esx:getSharedObject', function(obj)
+    ESX = obj
+end)
 
+RegisterServerEvent('esx-qalle-camerasystem:addSuspect')
+AddEventHandler('esx-qalle-camerasystem:addSuspect', function(pedID, action)
+    local pedID = pedID
     local newNumber = lastId + 1
 
     if action ~= nil then
-        table.insert(WitnessPeds, {random = newNumber, clothes = pedClothes, action = action})
+        table.insert(SuspectPeds, {random = newNumber, pedID = pedID, action = action})
     else
-        table.insert(WitnessPeds, {random = newNumber, clothes = pedClothes})
-    end    
+        table.insert(SuspectPeds, {random = newNumber, pedID = pedID})
+    end
 end)
 
-ESX.RegisterServerCallback('esx-qalle-camerasystem:getWitnesses', function(source, cb)
-    local witnesses = {}
+ESX.RegisterServerCallback('esx-qalle-camerasystem:getSuspects', function(source, cb)
+    local suspects = {}
 
-    for id, val in pairs(WitnessPeds) do
+    for index, value in pairs(SuspectPeds) do
         if val.action ~= nil then
-            table.insert(witnesses, { number = val.random, clothes = val.clothes, action = val.action })
+            table.insert(suspects, { number = value.random, pedID = value.pedID, action = value.action })
         else
-            table.insert(witnesses, { number = val.random, clothes = val.clothes })
+            table.insert(suspects, { number = value.random, pedID = value.pedID })
         end
     end
-    
-    cb(witnesses)
+
+    cb(suspects)
 end)
